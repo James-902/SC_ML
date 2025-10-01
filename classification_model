@@ -1,0 +1,109 @@
+# Import required libraries
+import pandas as pd
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import load_wine
+data = load_wine()
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
+from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+
+wine = load_wine()
+X = pd.DataFrame(wine.data, columns=wine.feature_names)
+y = pd.Series(wine.target, name='target')
+
+# Scale features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+df = pd.DataFrame(data.data, columns=data.feature_names)
+df['target'] = data.target
+
+from google.colab import files
+files.download('wine_dataset.csv')
+df= pd.read_csv('wine_dataset.csv')
+df
+df.to_csv('wine_dataset.csv', index=False)
+
+missing_values = df.isnull().sum()
+
+# Print missing values
+print("Missing values per column:\n")
+print(missing_values)
+
+# Optionally, print total missing values
+total_missing = missing_values.sum()
+print(f"\nTotal missing values in the dataset: {total_missing}")
+
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
+
+# DataFrame to store results
+results = pd.DataFrame(columns=['Model', 'Accuracy'])
+
+# Helper function for confusion matrix plotting
+def plot_conf_matrix(y_true, y_pred, title):
+    cm = confusion_matrix(y_true, y_pred)
+    plt.figure(figsize=(5, 4))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=wine.target_names, yticklabels=wine.target_names)
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.title(f'Confusion Matrix: {title}')
+    plt.show()
+
+# Train & evaluate models
+## 1. Logistic Regression
+lr = LogisticRegression(max_iter=1000)
+lr.fit(X_train, y_train)
+y_pred_lr = lr.predict(X_test)
+print("Logistic Regression\n", classification_report(y_test, y_pred_lr))
+plot_conf_matrix(y_test, y_pred_lr, "Logistic Regression")
+results.loc[len(results)] = ['Logistic Regression', accuracy_score(y_test, y_pred_lr)]
+
+## 2. Decision tree classifier
+lr = DecisionTreeClassifier (criterion='entropy')
+lr.fit(X_train, y_train)
+y_pred_lr = lr.predict(X_test)
+print("Decision_Tree_classifier\n", classification_report(y_test, y_pred_lr))
+plot_conf_matrix(y_test, y_pred_lr, "Decision_Tree_classifier")
+results.loc[len(results)] = ['Decision_Tree_classifier', accuracy_score(y_test, y_pred_lr)]
+
+## 3. Random Forest
+lr = RandomForestClassifier (n_estimators=100)
+lr.fit(X_train, y_train)
+y_pred_lr = lr.predict(X_test)
+print("Random_Forest_classifier\n", classification_report(y_test, y_pred_lr))
+plot_conf_matrix(y_test, y_pred_lr, "Random_Forest_classifier")
+results.loc[len(results)] = ['Random_Forest_classifier', accuracy_score(y_test, y_pred_lr)]
+
+## 4. Support Vector Machine
+lr = SVC(kernel='rbf', C=1.0, gamma='scale')
+lr.fit(X_train, y_train)
+y_pred_lr = lr.predict(X_test)
+print("Support Vector Machine\n", classification_report(y_test, y_pred_lr))
+plot_conf_matrix(y_test, y_pred_lr, "Support Vector Machine")
+results.loc[len(results)] = ['Support Vector Machine', accuracy_score(y_test, y_pred_lr)]
+
+## 5. K Neighbour classifier
+lr = KNeighborsClassifier (n_neighbors=5, weights='distance')
+lr.fit(X_train, y_train)
+y_pred_lr = lr.predict(X_test)
+print("K Neighbour\n", classification_report(y_test, y_pred_lr))
+plot_conf_matrix(y_test, y_pred_lr, "K Neighbour")
+results.loc[len(results)] = ['K Neighbour', accuracy_score(y_test, y_pred_lr)]
+
+## 5. Naive Bayes
+lr = GaussianNB()
+lr.fit(X_train, y_train)
+y_pred_lr = lr.predict(X_test)
+print("Naive Bayes\n", classification_report(y_test, y_pred_lr))
+plot_conf_matrix(y_test, y_pred_lr, "Naive Bayes")
+results.loc[len(results)] = ['Naive Bayes', accuracy_score(y_test, y_pred_lr)]
